@@ -11,6 +11,8 @@
 #include <random>
 #include <array>
 
+
+
 PlayMode::PlayMode(Client &client_) : client(client_) {
 }
 
@@ -76,6 +78,17 @@ void PlayMode::update(float elapsed) {
 	controls.up.downs = 0;
 	controls.down.downs = 0;
 	controls.jump.downs = 0;
+
+	// for (auto player : game.players) {
+	// 	glm::vec3 dead = {1.0f,1.0f,1.0f};
+	// 	if(player.color == dead){
+	// 		game.remove_player(player)
+			
+
+
+	// 	}
+	// }
+
 
 	//send/receive data:
 	client.poll([this](Connection *c, Connection::Event event){
@@ -166,6 +179,29 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
 					glm::vec3(player.position + Game::PlayerRadius * glm::vec2( 0.5f,-0.5f), 0.0f),
 					col
 				);
+				{ //use DrawLines to overlay some text:
+					glDisable(GL_DEPTH_TEST);
+					float aspect = float(drawable_size.x) / float(drawable_size.y);
+					DrawLines lines(glm::mat4(
+						1.0f / aspect, 0.0f, 0.0f, 0.0f,
+						0.0f, 1.0f, 0.0f, 0.0f,
+						0.0f, 0.0f, 1.0f, 0.0f,
+						0.0f, 0.0f, 0.0f, 1.0f
+					));
+
+					std::string winner_string = std::to_string(player.controls.score);
+
+					constexpr float H = 0.09f;
+					lines.draw_text(winner_string,
+						glm::vec3(-aspect + 0.1f * H, -1.0 + 0.1f * H, 0.0),
+						glm::vec3(H, 0.0f, 0.0f), glm::vec3(0.0f, H, 0.0f),
+						glm::u8vec4(0x00, 0x00, 0x00, 0x00));
+					float ofs = 2.0f / drawable_size.y;
+					lines.draw_text(winner_string,
+						glm::vec3(-aspect + 0.1f * H + ofs, -1.0 + + 0.1f * H + ofs, 0.0),
+						glm::vec3(H, 0.0f, 0.0f), glm::vec3(0.0f, H, 0.0f),
+						glm::u8vec4(0xff, 0xff, 0xff, 0x00));
+				}
 			}
 			for (uint32_t a = 0; a < circle.size(); ++a) {
 				lines.draw(
@@ -176,6 +212,30 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
 			}
 
 			draw_text(player.position + glm::vec2(0.0f, -0.1f + Game::PlayerRadius), player.name, 0.09f);
+
+			{ //use DrawLines to overlay some text:
+				glDisable(GL_DEPTH_TEST);
+				float aspect = float(drawable_size.x) / float(drawable_size.y);
+				DrawLines lines(glm::mat4(
+					1.0f / aspect, 0.0f, 0.0f, 0.0f,
+					0.0f, 1.0f, 0.0f, 0.0f,
+					0.0f, 0.0f, 1.0f, 0.0f,
+					0.0f, 0.0f, 0.0f, 1.0f
+				));
+
+				std::string winner_string = std::to_string(player.controls.score);
+
+				constexpr float H = 0.09f;
+				lines.draw_text(winner_string,
+					glm::vec3(-aspect + 0.1f * H, -1.0 + 0.1f * H, 0.0),
+					glm::vec3(H, 0.0f, 0.0f), glm::vec3(0.0f, H, 0.0f),
+					glm::u8vec4(0x00, 0x00, 0x00, 0x00));
+				float ofs = 2.0f / drawable_size.y;
+				lines.draw_text(winner_string,
+					glm::vec3(-aspect + 0.1f * H + ofs, -1.0 + + 0.1f * H + ofs, 0.0),
+					glm::vec3(H, 0.0f, 0.0f), glm::vec3(0.0f, H, 0.0f),
+					glm::u8vec4(0xff, 0xff, 0xff, 0x00));
+			}
 		}
 	}
 	GL_ERRORS();

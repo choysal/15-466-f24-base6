@@ -37,8 +37,11 @@ struct Player {
 	//player inputs (sent from client):
 	struct Controls {
 		Button left, right, up, down, jump;
+		uint8_t score = 0;
 
 		void send_controls_message(Connection *connection) const;
+
+		
 
 		//returns 'false' if no message or not a controls message,
 		//returns 'true' if read a controls message,
@@ -52,6 +55,8 @@ struct Player {
 
 	glm::vec3 color = glm::vec3(1.0f, 1.0f, 1.0f);
 	std::string name = "";
+	std::string item = "";
+	
 };
 
 struct Game {

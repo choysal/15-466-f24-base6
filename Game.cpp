@@ -12,7 +12,7 @@ void Player::Controls::send_controls_message(Connection *connection_) const {
 	assert(connection_);
 	auto &connection = *connection_;
 
-	uint32_t size = 5;
+	uint32_t size = 6;
 	connection.send(Message::C2S_Controls);
 	connection.send(uint8_t(size));
 	connection.send(uint8_t(size >> 8));
@@ -30,6 +30,8 @@ void Player::Controls::send_controls_message(Connection *connection_) const {
 	send_button(up);
 	send_button(down);
 	send_button(jump);
+
+	connection.send(score);
 }
 
 bool Player::Controls::recv_controls_message(Connection *connection_) {
@@ -44,7 +46,7 @@ bool Player::Controls::recv_controls_message(Connection *connection_) {
 	uint32_t size = (uint32_t(recv_buffer[3]) << 16)
 	              | (uint32_t(recv_buffer[2]) << 8)
 	              |  uint32_t(recv_buffer[1]);
-	if (size != 5) throw std::runtime_error("Controls message with size " + std::to_string(size) + " != 5!");
+	if (size != 6) throw std::runtime_error("Controls message with size " + std::to_string(size) + " != 6!");
 	
 	//expecting complete message:
 	if (recv_buffer.size() < 4 + size) return false;
@@ -64,6 +66,7 @@ bool Player::Controls::recv_controls_message(Connection *connection_) {
 	recv_button(recv_buffer[4+2], &up);
 	recv_button(recv_buffer[4+3], &down);
 	recv_button(recv_buffer[4+4], &jump);
+	score = recv_buffer[4+5];
 
 	//delete message from buffer:
 	recv_buffer.erase(recv_buffer.begin(), recv_buffer.begin() + 4 + size);
@@ -93,19 +96,22 @@ Player *Game::spawn_player() {
 			player.color.r = 1.0f;
 			player.color.g = 0.0f;
 			player.color.b = 0.0f;
+			player.item = "R";
 		} else if(color==1){
 			player.color.r = 0.0f;
 			player.color.g = 1.0f;
 			player.color.b = 0.0f;
+			player.item = "P";
 		} else if(color==2){
 			player.color.r = 0.0f;
 			player.color.g = 0.0f;
 			player.color.b = 1.0f;
+			player.item = "S";
 		}
 	} while (player.color == glm::vec3(0.0f));
 	player.color = glm::normalize(player.color);
 
-	player.name = "Player " + std::to_string(next_player_number++);
+	player.name = player.item + std::to_string(next_player_number++);
 
 	return &player;
 }
@@ -178,6 +184,146 @@ void Game::update(float elapsed) {
 			glm::vec2 delta_v12 = dir * glm::max(0.0f, -1.75f * glm::dot(dir, v12));
 			p2.velocity += 0.5f * delta_v12;
 			p1.velocity -= 0.5f * delta_v12;
+			//HEREHERE
+			//Handle rock paper scissors condition
+			//can check color flags
+			if (p2.item == "R"){
+				if(p1.item == "S"){
+					//kill p1
+					int color = rand() % 3; //0,1,2
+					if(color==0){
+						p1.color.r = 1.0f;
+						p1.color.g = 0.0f;
+						p1.color.b = 0.0f;
+						p1.item = "R";
+					} else if(color==1){
+						p1.color.r = 0.0f;
+						p1.color.g = 1.0f;
+						p1.color.b = 0.0f;
+						p1.item = "P";
+					} else if(color==2){
+						p1.color.r = 0.0f;
+						p1.color.g = 0.0f;
+						p1.color.b = 1.0f;
+						p1.item = "S";
+					}
+					p1.controls.score -= 1;
+					p2.controls.score += 1;
+				} else if(p1.item == "P"){
+					//kill p2
+					int color = rand() % 3; //0,1,2
+					if(color==0){
+						p2.color.r = 1.0f;
+						p2.color.g = 0.0f;
+						p2.color.b = 0.0f;
+						p2.item = "R";
+					} else if(color==1){
+						p2.color.r = 0.0f;
+						p2.color.g = 1.0f;
+						p2.color.b = 0.0f;
+						p2.item = "P";
+					} else if(color==2){
+						p2.color.r = 0.0f;
+						p2.color.g = 0.0f;
+						p2.color.b = 1.0f;
+						p2.item = "S";
+					}
+					p2.controls.score -= 1;
+					p1.controls.score += 1;
+				}
+			} else if (p2.item == "S"){
+				if(p1.item == "P"){
+					//kill p1
+					int color = rand() % 3; //0,1,2
+					if(color==0){
+						p1.color.r = 1.0f;
+						p1.color.g = 0.0f;
+						p1.color.b = 0.0f;
+						p1.item = "R";
+					} else if(color==1){
+						p1.color.r = 0.0f;
+						p1.color.g = 1.0f;
+						p1.color.b = 0.0f;
+						p1.item = "P";
+					} else if(color==2){
+						p1.color.r = 0.0f;
+						p1.color.g = 0.0f;
+						p1.color.b = 1.0f;
+						p1.item = "S";
+					}
+					p1.controls.score -= 1;
+					p2.controls.score += 1;
+				} else if(p1.item == "R"){
+					//kill p2
+					int color = rand() % 3; //0,1,2
+					if(color==0){
+						p2.color.r = 1.0f;
+						p2.color.g = 0.0f;
+						p2.color.b = 0.0f;
+						p2.item = "R";
+					} else if(color==1){
+						p2.color.r = 0.0f;
+						p2.color.g = 1.0f;
+						p2.color.b = 0.0f;
+						p2.item = "P";
+					} else if(color==2){
+						p2.color.r = 0.0f;
+						p2.color.g = 0.0f;
+						p2.color.b = 1.0f;
+						p2.item = "S";
+					}
+					p2.controls.score -= 1;
+					p1.controls.score += 1;
+				}
+			} else {
+				if(p1.item == "R"){
+					//kill p1
+					int color = rand() % 3; //0,1,2
+					if(color==0){
+						p1.color.r = 1.0f;
+						p1.color.g = 0.0f;
+						p1.color.b = 0.0f;
+						p1.item = "R";
+					} else if(color==1){
+						p1.color.r = 0.0f;
+						p1.color.g = 1.0f;
+						p1.color.b = 0.0f;
+						p1.item = "P";
+					} else if(color==2){
+						p1.color.r = 0.0f;
+						p1.color.g = 0.0f;
+						p1.color.b = 1.0f;
+						p1.item = "S";
+					}
+					p1.controls.score -= 1;
+					p2.controls.score += 1;
+				} else if(p1.item == "S"){
+					//kill p2
+					int color = rand() % 3; //0,1,2
+					if(color==0){
+						p2.color.r = 1.0f;
+						p2.color.g = 0.0f;
+						p2.color.b = 0.0f;
+						p2.item = "R";
+					} else if(color==1){
+						p2.color.r = 0.0f;
+						p2.color.g = 1.0f;
+						p2.color.b = 0.0f;
+						p2.item = "P";
+					} else if(color==2){
+						p2.color.r = 0.0f;
+						p2.color.g = 0.0f;
+						p2.color.b = 1.0f;
+						p2.item = "S";
+					}
+					p2.controls.score -= 1;
+					p1.controls.score += 1;
+				}
+
+			}
+			
+			p1.name = p1.item + p1.name[1];
+			p2.name = p2.item + p2.name[1];
 		}
 		//player/arena collisions:
 		if (p1.position.x < ArenaMin.x + PlayerRadius) {
