@@ -12,7 +12,7 @@ void Player::Controls::send_controls_message(Connection *connection_) const {
 	assert(connection_);
 	auto &connection = *connection_;
 
-	uint32_t size = 6;
+	uint32_t size = 5;
 	connection.send(Message::C2S_Controls);
 	connection.send(uint8_t(size));
 	connection.send(uint8_t(size >> 8));
@@ -30,8 +30,6 @@ void Player::Controls::send_controls_message(Connection *connection_) const {
 	send_button(up);
 	send_button(down);
 	send_button(jump);
-
-	connection.send(score);
 }
 
 bool Player::Controls::recv_controls_message(Connection *connection_) {
@@ -46,7 +44,7 @@ bool Player::Controls::recv_controls_message(Connection *connection_) {
 	uint32_t size = (uint32_t(recv_buffer[3]) << 16)
 	              | (uint32_t(recv_buffer[2]) << 8)
 	              |  uint32_t(recv_buffer[1]);
-	if (size != 6) throw std::runtime_error("Controls message with size " + std::to_string(size) + " != 6!");
+	if (size != 5) throw std::runtime_error("Controls message with size " + std::to_string(size) + " != 5!");
 	
 	//expecting complete message:
 	if (recv_buffer.size() < 4 + size) return false;
@@ -66,7 +64,6 @@ bool Player::Controls::recv_controls_message(Connection *connection_) {
 	recv_button(recv_buffer[4+2], &up);
 	recv_button(recv_buffer[4+3], &down);
 	recv_button(recv_buffer[4+4], &jump);
-	score = recv_buffer[4+5];
 
 	//delete message from buffer:
 	recv_buffer.erase(recv_buffer.begin(), recv_buffer.begin() + 4 + size);
@@ -207,8 +204,10 @@ void Game::update(float elapsed) {
 						p1.color.b = 1.0f;
 						p1.item = "S";
 					}
-					p1.controls.score -= 1;
-					p2.controls.score += 1;
+					p2.score += 1;
+					if(p1.score > 0) p1.score -= 1;
+					std::cout << p1.score;
+					std::cout << p2.score;
 				} else if(p1.item == "P"){
 					//kill p2
 					int color = rand() % 3; //0,1,2
@@ -228,8 +227,10 @@ void Game::update(float elapsed) {
 						p2.color.b = 1.0f;
 						p2.item = "S";
 					}
-					p2.controls.score -= 1;
-					p1.controls.score += 1;
+					p1.score += 1;
+					if(p2.score > 0) p2.score -= 1;
+					std::cout << p1.score;
+					std::cout << p2.score;
 				}
 			} else if (p2.item == "S"){
 				if(p1.item == "P"){
@@ -251,8 +252,10 @@ void Game::update(float elapsed) {
 						p1.color.b = 1.0f;
 						p1.item = "S";
 					}
-					p1.controls.score -= 1;
-					p2.controls.score += 1;
+					p2.score += 1;
+					if(p1.score > 0) p1.score -= 1;
+					std::cout << p1.score;
+					std::cout << p2.score;
 				} else if(p1.item == "R"){
 					//kill p2
 					int color = rand() % 3; //0,1,2
@@ -272,8 +275,10 @@ void Game::update(float elapsed) {
 						p2.color.b = 1.0f;
 						p2.item = "S";
 					}
-					p2.controls.score -= 1;
-					p1.controls.score += 1;
+					p1.score += 1;
+					if(p2.score > 0) p2.score -= 1;
+					std::cout << p1.score;
+					std::cout << p2.score;
 				}
 			} else {
 				if(p1.item == "R"){
@@ -295,8 +300,10 @@ void Game::update(float elapsed) {
 						p1.color.b = 1.0f;
 						p1.item = "S";
 					}
-					p1.controls.score -= 1;
-					p2.controls.score += 1;
+					p2.score += 1;
+					if(p1.score > 0) p1.score -= 1;
+					std::cout << p1.score;
+					std::cout << p2.score;
 				} else if(p1.item == "S"){
 					//kill p2
 					int color = rand() % 3; //0,1,2
@@ -316,8 +323,10 @@ void Game::update(float elapsed) {
 						p2.color.b = 1.0f;
 						p2.item = "S";
 					}
-					p2.controls.score -= 1;
-					p1.controls.score += 1;
+					p1.score += 1;
+					if(p2.score > 0) p2.score -= 1;
+					std::cout << p1.score;
+					std::cout << p2.score;
 				}
 
 			}
@@ -364,6 +373,7 @@ void Game::send_state_message(Connection *connection_, Player *connection_player
 		connection.send(player.position);
 		connection.send(player.velocity);
 		connection.send(player.color);
+		connection.send(player.score);
 	
 		//NOTE: can't just 'send(name)' because player.name is not plain-old-data type.
 		//effectively: truncates player name to 255 chars
@@ -419,6 +429,7 @@ bool Game::recv_state_message(Connection *connection_) {
 		read(&player.position);
 		read(&player.velocity);
 		read(&player.color);
+		read(&player.score);
 		uint8_t name_len;
 		read(&name_len);
 		//n.b. would probably be more efficient to directly copy from recv_buffer, but I think this is clearer:
