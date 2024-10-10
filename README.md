@@ -23,7 +23,8 @@ Screen Shot:
 
 How To Play:
 
-Each player randomly spawns in as either rock(red), paper(green), or scissors(blue). This will also be noted by the letter next to the player number (ex P1, R2, S3).
+Each player randomly spawns in as either rock(red), paper(green), or scissors(blue). This is also be noted by the letter next to the player number:
+(ex P1, R2, S3 = Paper1, Rock2, Scissors3).
 Rock beats Scissors
 Scissors beats Paper
 Paper beats Rock
