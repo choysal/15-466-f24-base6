@@ -81,14 +81,27 @@ Player *Game::spawn_player() {
 	players.emplace_back();
 	Player &player = players.back();
 
+	// rps = {Color{1.0f,0.0f,0.0f},Color{0.0f,1.0f,0.0f},Color{0.0f,0.0f,1.0f}}; //default colors
+
 	//random point in the middle area of the arena:
 	player.position.x = glm::mix(ArenaMin.x + 2.0f * PlayerRadius, ArenaMax.x - 2.0f * PlayerRadius, 0.4f + 0.2f * mt() / float(mt.max()));
 	player.position.y = glm::mix(ArenaMin.y + 2.0f * PlayerRadius, ArenaMax.y - 2.0f * PlayerRadius, 0.4f + 0.2f * mt() / float(mt.max()));
 
 	do {
-		player.color.r = mt() / float(mt.max());
-		player.color.g = mt() / float(mt.max());
-		player.color.b = mt() / float(mt.max());
+		int color = rand() % 3; //0,1,2
+		if(color==0){
+			player.color.r = 1.0f;
+			player.color.g = 0.0f;
+			player.color.b = 0.0f;
+		} else if(color==1){
+			player.color.r = 0.0f;
+			player.color.g = 1.0f;
+			player.color.b = 0.0f;
+		} else if(color==2){
+			player.color.r = 0.0f;
+			player.color.g = 0.0f;
+			player.color.b = 1.0f;
+		}
 	} while (player.color == glm::vec3(0.0f));
 	player.color = glm::normalize(player.color);
 

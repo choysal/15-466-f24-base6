@@ -24,6 +24,14 @@ struct Button {
 	bool pressed = false; //is the button pressed now
 };
 
+// struct Color {
+// 	float r = 0.0f;
+// 	float g = 0.0f;
+// 	float b = 0.0f;
+// };
+
+// std::array<Color, 3> rps;
+
 //state of one player in the game:
 struct Player {
 	//player inputs (sent from client):
