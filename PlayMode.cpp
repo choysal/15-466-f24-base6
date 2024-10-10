@@ -181,7 +181,6 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
 				);
 
 				std::string winner_string = "SCORE= " + std::to_string(player.score);
-				std::cout << "player score" + winner_string << std::endl;
 
 				constexpr float H = 0.09f;
 				draw_text(Game::ArenaMin,winner_string,H);

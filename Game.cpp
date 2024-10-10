@@ -206,8 +206,6 @@ void Game::update(float elapsed) {
 					}
 					p2.score += 1;
 					if(p1.score > 0) p1.score -= 1;
-					std::cout << p1.score;
-					std::cout << p2.score;
 				} else if(p1.item == "P"){
 					//kill p2
 					int color = rand() % 3; //0,1,2
@@ -229,8 +227,6 @@ void Game::update(float elapsed) {
 					}
 					p1.score += 1;
 					if(p2.score > 0) p2.score -= 1;
-					std::cout << p1.score;
-					std::cout << p2.score;
 				}
 			} else if (p2.item == "S"){
 				if(p1.item == "P"){
@@ -254,8 +250,6 @@ void Game::update(float elapsed) {
 					}
 					p2.score += 1;
 					if(p1.score > 0) p1.score -= 1;
-					std::cout << p1.score;
-					std::cout << p2.score;
 				} else if(p1.item == "R"){
 					//kill p2
 					int color = rand() % 3; //0,1,2
@@ -277,8 +271,6 @@ void Game::update(float elapsed) {
 					}
 					p1.score += 1;
 					if(p2.score > 0) p2.score -= 1;
-					std::cout << p1.score;
-					std::cout << p2.score;
 				}
 			} else {
 				if(p1.item == "R"){
@@ -302,8 +294,6 @@ void Game::update(float elapsed) {
 					}
 					p2.score += 1;
 					if(p1.score > 0) p1.score -= 1;
-					std::cout << p1.score;
-					std::cout << p2.score;
 				} else if(p1.item == "S"){
 					//kill p2
 					int color = rand() % 3; //0,1,2
@@ -325,10 +315,7 @@ void Game::update(float elapsed) {
 					}
 					p1.score += 1;
 					if(p2.score > 0) p2.score -= 1;
-					std::cout << p1.score;
-					std::cout << p2.score;
 				}
-
 			}
 			
 			p1.name = p1.item + p1.name[1];
